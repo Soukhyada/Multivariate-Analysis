@@ -20,4 +20,5 @@ The goals of the analysis can be:
 
 Resources:
 https://rpubs.com/ippromek/277781
+
 https://www.kaggle.com/chrisbow/an-introduction-to-facebook-ad-analysis-using-r
