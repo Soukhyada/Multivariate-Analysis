@@ -30,6 +30,7 @@ The dataset describes the columns in the data as follows:
 10.Dystopia Residual: The extent to which Dystopia Residual contributed to the calculation of the Happiness Score.
 
 References:
+
 https://www.kaggle.com/unsdsn/world-happiness
 
 https://rpubs.com/haleyjacob/world-happiness
