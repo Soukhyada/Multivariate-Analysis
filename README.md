@@ -45,6 +45,8 @@ The dataset describes the columns in the data as follows:
 
 10.Dystopia Residual: The extent to which Dystopia Residual contributed to the calculation of the Happiness Score.
 
+Dystopia is an imaginary country that has the world’s least-happy people. The purpose in establishing Dystopia is to have a benchmark against which all countries can be favorably compared (no country performs more poorly than Dystopia) in terms of each of the six key variables.[Contrast to Utopia] The Dystopia Residual metric actually is the Dystopia Happiness Score(1.85) + the Residual value or the unexplained value for each country The residuals, or unexplained components, differ for each country, reflecting the extent to which the six variables either over- or under-explain average 2014-2016 life evaluations.
+
 **References:**
 
 https://www.kaggle.com/unsdsn/world-happiness
