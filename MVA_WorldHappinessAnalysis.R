@@ -1,7 +1,6 @@
-#Soukhyada Vaidya
 #Assignment: World Happiness Analysis
 #Loading the data
-worldh <- read.csv("C:/Users/Soukhyada/Desktop/WH_2017.csv")
+worldh <- read.csv("C:/Users/Soukhyada/Desktop/MVA/WH_2017.csv")
 
 #Loading packages required for the analysis
 library(plyr)
@@ -21,6 +20,12 @@ library(formattable)
 library(cowplot)
 library(ggpubr)
 library(plot3D)
+library(latexpdf)
+library(car)
+library(FactoMineR)
+library(factoextra)
+library(corrplot)
+library(mice)
 
 #View the data
 View(worldh)
@@ -29,14 +34,53 @@ head(worldh)
 #Display the structure of the attributes
 str(worldh)
 
-# Changing the name of columns
-colnames (worldh) <- c("Country", "Happiness.Rank", "Happiness.Score",
-                          "Whisker.High", "Whisker.Low", "Economy", "Family",
-                          "Life.Expectancy", "Freedom", "Generosity",
-                          "Trust", "Dystopia.Residual")
+# Adding another column name "Continent"
+worldh$Continent <- NA
 
 # Deleting unnecessary columns (Whisker.high and Whisker.low)
 worldh <- worldh[, -c(4,5)]
+
+# Changing the name of columns
+colnames (worldh) <- c("Country", "Happiness.Rank", "Happiness.Score",
+                       "Economy", "Family", "Life.Expectancy", "Freedom", "Generosity",
+                       "Trust", "Dystopia.Residual", "Continent")
+
+# Adding the values for Continent name in the data.
+
+worldh$Continent[which(worldh$Country %in% c("Israel", "United Arab Emirates", "Singapore", "Thailand", "Taiwan Province of China",
+                                             "Qatar", "Saudi Arabia", "Kuwait", "Bahrain", "Malaysia", "Uzbekistan", "Japan",
+                                             "South Korea", "Turkmenistan", "Kazakhstan", "Turkey", "Hong Kong S.A.R., China", "Philippines",
+                                             "Jordan", "China", "Pakistan", "Indonesia", "Azerbaijan", "Lebanon", "Vietnam",
+                                             "Tajikistan", "Bhutan", "Kyrgyzstan", "Nepal", "Mongolia", "Palestinian Territories",
+                                             "Iran", "Bangladesh", "Myanmar", "Iraq", "Sri Lanka", "Armenia", "India", "Georgia",
+                                             "Cambodia", "Afghanistan", "Yemen", "Syria"))] <- "Asia"
+worldh$Continent[which(worldh$Country %in% c("Norway", "Denmark", "Iceland", "Switzerland", "Finland",
+                                             "Netherlands", "Sweden", "Austria", "Ireland", "Germany",
+                                             "Belgium", "Luxembourg", "United Kingdom", "Czech Republic",
+                                             "Malta", "France", "Spain", "Slovakia", "Poland", "Italy",
+                                             "Russia", "Lithuania", "Latvia", "Moldova", "Romania",
+                                             "Slovenia", "North Cyprus", "Cyprus", "Estonia", "Belarus",
+                                             "Serbia", "Hungary", "Croatia", "Kosovo", "Montenegro",
+                                             "Greece", "Portugal", "Bosnia and Herzegovina", "Macedonia",
+                                             "Bulgaria", "Albania", "Ukraine"))] <- "Europe"
+worldh$Continent[which(worldh$Country %in% c("Canada", "Costa Rica", "United States", "Mexico",  
+                                             "Panama","Trinidad and Tobago", "El Salvador", "Belize", "Guatemala",
+                                             "Jamaica", "Nicaragua", "Dominican Republic", "Honduras",
+                                             "Haiti"))] <- "North America"
+worldh$Continent[which(worldh$Country %in% c("Chile", "Brazil", "Argentina", "Uruguay",
+                                             "Colombia", "Ecuador", "Bolivia", "Peru",
+                                             "Paraguay", "Venezuela"))] <- "South America"
+worldh$Continent[which(worldh$Country %in% c("New Zealand", "Australia"))] <- "Australia"
+worldh$Continent[which(is.na(worldh$Continent))] <- "Africa"
+
+# Moving the Continent column at the second position.
+
+worldh <- worldh %>% select(Country,Continent, everything())
+
+str(worldh)
+
+#Converting the Continent values into factorial.
+worldh$Continent <- as.factor(worldh$Continent)
 
 # Finding the correlation between numerical columns
 Num.cols <- sapply(worldh, is.numeric)
@@ -74,3 +118,46 @@ scatter3D(dat$Generosity, dat$Economy, dat$Happiness.Score, phi = 0, bty = "g",
           ylab ="Economy", zlab = "Happiness.Score")
 #From the scatter plot we cannot determine that combination of high economy and generosity leads to greater happiness score. 
 #This is something we have to conclude after analyzing the effect of these 2 taken together.
+
+
+# Checking the outliers in the dataset using the boxplot.
+names(worldh)[4] <- "Happiness_Score"
+
+ggplot(worldh, aes(x=Continent, y= Happiness_Score, colour = Continent)) + 
+  
+  geom_boxplot() + 
+  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  
+  labs(title = "Happiness Score Boxplot",
+       
+       x = "Continent",
+       
+       y = "Happiness Score")
+
+
+ 
+
+##Checking for normality using shaprio test
+
+qqPlot(worldh$Economy)
+shapiro.test(worldh$Economy)
+
+#p-value is greater than 0.05 implying that the data is not significantly different from normal distribution 
+qqPlot(worldh$Family)
+shapiro.test(worldh$Family)
+
+qqPlot(worldh$Life.Expectancy)
+shapiro.test(worldh$Life.Expectancy)
+
+qqPlot(worldh$Freedom)
+shapiro.test(worldh$Freedom)
+
+qqPlot(worldh$Generosity)
+shapiro.test(worldh$Generosity)
+
+qqPlot(worldh$Trust)
+shapiro.test(worldh$Trust)
+
+#Family,Life expectancy and trust variables are not normally distributed
+
