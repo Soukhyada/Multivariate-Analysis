@@ -1,3 +1,4 @@
+#Soukhyada Vaidya
 #Assignment: World Happiness Analysis
 #Loading the data
 worldh <- read.csv("C:/Users/Soukhyada/Desktop/MVA/WH_2017.csv")
@@ -160,4 +161,75 @@ qqPlot(worldh$Trust)
 shapiro.test(worldh$Trust)
 
 #Family,Life expectancy and trust variables are not normally distributed
+
+####PCA################
+act_col <- c(3, 5:10)
+
+act_col
+
+happiness_new <- worldh[, act_col]
+
+cor(happiness_new)
+
+happiness_pca <- prcomp(happiness_new,scale=TRUE)
+
+summary(happiness_pca)
+
+(eigen_happiness <- happiness_pca$sdev^2)
+
+eigen_happiness
+
+names(eigen_happiness) <- paste("PC",1:7,sep="")
+
+sumlambdas <- sum(eigen_happiness)
+sumlambdas
+propvar <- eigen_happiness/sumlambdas
+propvar
+cumvar_happiness <- cumsum(propvar)
+cumvar_happiness
+matlambdas <- rbind(eigen_happiness,propvar,cumvar_happiness)
+rownames(matlambdas) <- c("Eigenvalues","Prop. variance","Cum. prop. variance")
+
+round(matlambdas,4)
+summary(happiness_pca)
+happiness_pca$rotation
+print(happiness_pca)
+
+
+happiness_pca$x
+
+happiness_new
+md.pattern(happiness_new)
+happy.pca <- PCA(happiness_new, graph = F)
+eig.val <- get_eigenvalue(happy.pca)
+eig.val
+fviz_eig(happy.pca, addlabels = TRUE, ylim = c(0, 60), linecolor = "purple", barfill = "orange", barcolor = "orange")
+
+#Showing the variables
+var <- get_pca_var(happy.pca)
+fviz_pca_var(happy.pca, col.var = "darkblue")
+#Analysis:We see that for instance family, life expectancy and economy are highly correlated. Trust in the government and freedom are also correlated.
+#We also see that life expectancy, etc are more correlated with the first dimension whereas freedom, generousity are more correlated with the second dimension.
+
+#Here ,Cos2 shows the quality of representation
+fviz_cos2(happy.pca, choice ="var", axes = 1:2, top = 10, color = "dark blue" )
+
+#Contribution of the variables
+var$contrib
+
+#Contribution of the top 5 variables
+fviz_contrib(happy.pca, choice = "var", axes = 1, top = 5)
+
+#PCA plot with "fviz_pca_ind"
+ind <- get_pca_ind(happy.pca)
+ind
+
+happy.pca$ind
+
+#Plotting the graph
+fviz_pca_ind (happy.pca, pointsize = "cos2", pointshape = 22, fill = "blue", repel = TRUE)
+
+#Method to show only the 50 countries best represented.
+plot(happy.pca,  select = "cos2 50", cex=1,  col.ind = "darkblue", title = "50 countries with highest cos2", cex.main=2, col.main= "darkblue")
+
 
